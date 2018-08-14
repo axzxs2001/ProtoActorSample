@@ -22,14 +22,15 @@ namespace HelloWorld
     {
         public string Who;
     }
+
     class HelloActor : IActor
     {
         public Task ReceiveAsync(IContext context)
         {
             var msg = context.Message;
-            if (msg is Hello r)
+            if (msg is Hello hello)
             {
-                Console.WriteLine($"Hello {r.Who}");
+                Console.WriteLine($"Hello {hello.Who}");
             }
             return Actor.Done;
         }
