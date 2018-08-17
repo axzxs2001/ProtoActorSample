@@ -10,45 +10,45 @@ namespace P002_CustomProps
         static void Main(string[] args)
         {
             var props = new Props()
-                // the producer is a delegate that returns a new instance of an IActor
+                // 用道具代理返回一个IActor实例
                 .WithProducer(() => new MyActor())
-                // the default dispatcher uses the thread pool and limits throughput to 300 messages per mailbox run
+                //默认调度器用线程池，邮箱中最多300个消息吞吐量
                 .WithDispatcher(new ThreadPoolDispatcher { Throughput = 300 })
-                // the default mailbox uses unbounded queues
+                //默认邮箱使用无界队列
                 .WithMailbox(() => UnboundedMailbox.Create())
-                // the default strategy restarts child actors a maximum of 10 times within a 10 second window
+                //默认策略在10秒的窗口内最多重新启动子Actor 10次
                 .WithChildSupervisorStrategy(new OneForOneStrategy((who, reason) =>
                 SupervisorDirective.Restart, 10, TimeSpan.FromSeconds(10)))
-                // middlewares can be chained to intercept incoming and outgoing messages
-                // receive middlewares are invoked before the actor receives the message
-                // sender middlewares are invoked before the message is sent to the target PID
+                //可以将中间件链接起来以拦截传入和传出消息 
+                //接收中间件在Actor接收消息之前被调用
+                //发送者中间件在消息发送到目标PID之前被调用
                 .WithReceiveMiddleware(
                 next => async c =>
                 {
-                    Console.WriteLine($"middleware 1 enter {c.Message.GetType()}:{c.Message}");
+                    Console.WriteLine($"Receive middleware 1 enter {c.Message.GetType()}:{c.Message}");
                     await next(c);
-                    Console.WriteLine($"middleware 1 exit");
+                    Console.WriteLine($"Receive middleware 1 exit");
                 },
                 next => async c =>
                 {
-                    Console.WriteLine($"middleware 2 enter {c.Message.GetType()}:{c.Message}");
+                    Console.WriteLine($"Receive middleware 2 enter {c.Message.GetType()}:{c.Message}");
                     await next(c);
-                    Console.WriteLine($"middleware 2 exit");
+                    Console.WriteLine($"Receive middleware 2 exit");
                 })
                 .WithSenderMiddleware(
                 next => async (c, target, envelope) =>
                 {
-                    Console.WriteLine($"middleware 1 enter {c.Message.GetType()}:{c.Message}");
+                    Console.WriteLine($"Sender middleware 1 enter {c.Message.GetType()}:{c.Message}");
                     await next(c, target, envelope);
-                    Console.WriteLine($"middleware 1 enter {c.Message.GetType()}:{c.Message}");
+                    Console.WriteLine($"Sender middleware 1 enter {c.Message.GetType()}:{c.Message}");
                 },
                 next => async (c, target, envelope) =>
                 {
-                    Console.WriteLine($"middleware 2 enter {c.Message.GetType()}:{c.Message}");
+                    Console.WriteLine($"Sender middleware 2 enter {c.Message.GetType()}:{c.Message}");
                     await next(c, target, envelope);
-                    Console.WriteLine($"middleware 2 enter {c.Message.GetType()}:{c.Message}");
+                    Console.WriteLine($"Sender middleware 2 enter {c.Message.GetType()}:{c.Message}");
                 })
-                // the default spawner constructs the Actor, Context and Process
+                // 默认的 spawner 构造  Actor, Context 和 Process
                 .WithSpawner(Props.DefaultSpawner);
 
             //从props衍生pid，pid代理一个actor的地址
