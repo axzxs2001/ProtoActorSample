@@ -12,7 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P002_CustomProps", "P002_CustomProps\P002_CustomProps.csproj", "{E4BE6ECE-5E9E-4944-BC3C-DC4F549167F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P003_SpawningActors", "P003_SpawningActors\P003_SpawningActors.csproj", "{BD834161-9EDD-4C23-927B-566C1FC44E03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P003_SpawningActors", "P003_SpawningActors\P003_SpawningActors.csproj", "{BD834161-9EDD-4C23-927B-566C1FC44E03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P004_PID", "P004_PID\P004_PID.csproj", "{81E80FDA-50E5-49AF-BF5C-706CE30585C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +34,10 @@ Global
 		{BD834161-9EDD-4C23-927B-566C1FC44E03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD834161-9EDD-4C23-927B-566C1FC44E03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD834161-9EDD-4C23-927B-566C1FC44E03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81E80FDA-50E5-49AF-BF5C-706CE30585C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81E80FDA-50E5-49AF-BF5C-706CE30585C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81E80FDA-50E5-49AF-BF5C-706CE30585C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81E80FDA-50E5-49AF-BF5C-706CE30585C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
