@@ -33,6 +33,7 @@ namespace P004_PID
                 }
 
                 Thread.Sleep(2000);
+
             }
         }
     }
@@ -41,6 +42,7 @@ namespace P004_PID
     {
         public Task ReceiveAsync(IContext context)
         {
+
             if (context.Message is Request request)
             {
                 switch (request.RequestType)
@@ -49,11 +51,11 @@ namespace P004_PID
                     case "one-way"://context.Sender为null
                         Console.WriteLine("接收到：" + request.RequestType + "," + request.Time + ":" + request.Name);
                         break;
-                    case "two-way-1"://context.Sender为自己
+                    case "two-way-1"://context.Sender= context.Self为自己
                         Console.WriteLine("接收到：" + request.RequestType + "," + request.Time + ":" + request.Name);
                         context.Respond(new Response() { Time = DateTime.Now, Name = "服务端应答" });
                         break;
-                    case "two-way-2"://context.Sender为新实例
+                    case "two-way-2"://context.Sender!= context.Self为新实例
                         Console.WriteLine("接收到：" + request.RequestType + "," + request.Time + ":" + request.Name);
                         context.Respond(new Response() { Time = DateTime.Now, Name = "服务端应答" });
                         break;
