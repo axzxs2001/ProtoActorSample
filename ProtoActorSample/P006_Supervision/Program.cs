@@ -16,7 +16,7 @@ namespace P006_Supervision
 
             var sn = 1;
             while (true)
-            {              
+            {
                 Console.WriteLine($"{sn++}--------------------begin-----------------");
                 foreach (var goods in user.ShopingCat.Goodses)
                 {
@@ -58,7 +58,7 @@ namespace P006_Supervision
         public ShopingCatActor()
         {
             _shopingCat = new ShopingCat();
-
+            Console.WriteLine("*******************ctor ShopingCatActor");
         }
         public Task ReceiveAsync(IContext context)
         {
@@ -76,6 +76,8 @@ namespace P006_Supervision
             {
                 case User user:
                     childPid.Request(_shopingCat, childPid);
+                    //var result = childPid.RequestAsync<int>(_shopingCat).Result;
+                    //Console.WriteLine($"result={result}");
                     user.ShopingCat = _shopingCat;
                     break;
             }
@@ -87,6 +89,10 @@ namespace P006_Supervision
     /// </summary>
     class GoodsActor : IActor
     {
+        public GoodsActor()
+        {
+            Console.WriteLine("***********************ctor GoodsActor");
+        }
 
         public Task ReceiveAsync(IContext context)
         {
@@ -97,8 +103,7 @@ namespace P006_Supervision
                     var goods = new Goods { Name = "红茶", Price = 3.0m, Describe = "统一" };
                     var random = new Random();
                     goods.Quantity = random.Next(1, 3) - 1;
-
-                    Console.WriteLine(goods.Quantity);
+                    //context.Respond(goods.Quantity);
                     if (goods.Quantity <= 0)
                     {
                         throw new RecoverableException("数量不能小于等于0");
@@ -108,6 +113,7 @@ namespace P006_Supervision
                         shopingCat.Goodses.Add(goods);
                         Console.WriteLine($"添加 {goods} 到购物车里");
                     }
+                  
                     break;
             }
             return Actor.Done;
