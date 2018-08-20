@@ -1,9 +1,8 @@
 ﻿using Proto;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace P006_Supervision
 {
@@ -11,19 +10,21 @@ namespace P006_Supervision
     {
         static void Main(string[] args)
         {
-
-
-            var props = Actor.FromProducer(() => new ShopingCatActor()).WithChildSupervisorStrategy(new OneForOneStrategy(SupervisorMode.Decide, 10, TimeSpan.FromSeconds(10)));
+            var props = Actor.FromProducer(() => new ShopingCatActor()).WithChildSupervisorStrategy(new OneForOneStrategy(SupervisorMode.Decide, 3, TimeSpan.FromSeconds(5)));
             var pid = Actor.Spawn(props);
-
-            var order = new Order();
+            var user = new User { UserName = "gsw" };
 
             var sn = 1;
             while (true)
-            {
-                Console.WriteLine($"第{sn++}次");
+            {              
+                Console.WriteLine($"{sn++}--------------------begin-----------------");
+                foreach (var goods in user.ShopingCat.Goodses)
+                {
+                    Console.WriteLine(goods);
+                }
+                Console.WriteLine("---------------------end------------------");
                 Console.ReadLine();
-                pid.Request(order, pid);
+                pid.Request(user, pid);
 
             }
 
@@ -33,7 +34,9 @@ namespace P006_Supervision
     {
         public static SupervisorDirective Decide(PID pid, Exception reason)
         {
-            Console.WriteLine(reason.Message);
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(reason.Message + "   " + pid);
+            Console.ResetColor();
             switch (reason)
             {
                 case RecoverableException _:
@@ -46,14 +49,15 @@ namespace P006_Supervision
             }
         }
     }
-
+    /// <summary>
+    /// 购物车actor
+    /// </summary>
     class ShopingCatActor : IActor
     {
         ShopingCat _shopingCat;
         public ShopingCatActor()
         {
             _shopingCat = new ShopingCat();
-            _shopingCat.UserName = "gsw";
 
         }
         public Task ReceiveAsync(IContext context)
@@ -70,14 +74,17 @@ namespace P006_Supervision
             }
             switch (context.Message)
             {
-                case Order order:
+                case User user:
                     childPid.Request(_shopingCat, childPid);
-                    order.ShopingCat = _shopingCat;
+                    user.ShopingCat = _shopingCat;
                     break;
             }
             return Actor.Done;
         }
     }
+    /// <summary>
+    /// 商品actor
+    /// </summary>
     class GoodsActor : IActor
     {
 
@@ -86,6 +93,7 @@ namespace P006_Supervision
             switch (context.Message)
             {
                 case ShopingCat shopingCat:
+
                     var goods = new Goods { Name = "红茶", Price = 3.0m, Describe = "统一" };
                     var random = new Random();
                     goods.Quantity = random.Next(1, 3) - 1;
@@ -98,23 +106,26 @@ namespace P006_Supervision
                     else
                     {
                         shopingCat.Goodses.Add(goods);
-                        Console.WriteLine("添加商品到购物车里");
+                        Console.WriteLine($"添加 {goods} 到购物车里");
                     }
                     break;
             }
             return Actor.Done;
         }
     }
-
-    class Order
+    /// <summary>
+    /// 用户
+    /// </summary>
+    class User
     {
-        public ShopingCat ShopingCat { get; set; }
-
-        public Goods Goods { get; set; }
+        public ShopingCat ShopingCat { get; set; } = new ShopingCat();
+        public string UserName { get; set; }
     }
+    /// <summary>
+    /// 购物车
+    /// </summary>
     class ShopingCat
     {
-        public string UserName { get; set; }
         public List<Goods> Goodses
         { get; set; } = new List<Goods>();
     }
@@ -132,7 +143,7 @@ namespace P006_Supervision
         public string Describe { get; set; }
         public override string ToString()
         {
-            return $"Name={Name},Quantity={Quantity}";
+            return $"Name={Name}，Quantity={Quantity}，Price={Price}，Describe={Describe}";
         }
     }
 
