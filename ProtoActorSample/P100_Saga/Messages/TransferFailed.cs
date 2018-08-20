@@ -13,7 +13,10 @@ namespace P100_Saga.Messages
         /// 原因
         /// </summary>
         public string Reason { get; }
-
+        /// <summary>
+        /// 转帐失败
+        /// </summary>
+        /// <param name="reason">原因</param>
         public TransferFailed(string reason)
         {
             Reason = reason;

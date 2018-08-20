@@ -13,7 +13,10 @@ namespace P100_Saga.Messages
         /// 消息
         /// </summary>
         public string Message { get; }
-
+        /// <summary>
+        /// 升级转移
+        /// </summary>
+        /// <param name="message">消息</param>
         public EscalateTransfer(string message)
         {
             Message = message;

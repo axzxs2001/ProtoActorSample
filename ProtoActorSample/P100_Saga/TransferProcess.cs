@@ -17,7 +17,7 @@ namespace P100_Saga
         private readonly Behavior _behavior = new Behavior();
         private bool _restarting;
         private bool _stopping;
-        private bool _processCompleted;     
+        private bool _processCompleted;
 
         public TransferProcess(PID from, PID to, decimal amount, IProvider provider, string persistenceId, Random random, double availability)
         {
@@ -39,7 +39,7 @@ namespace P100_Saga
                     //转换成等待贷方确认
                     _behavior.Become(AwaitingDebitConfirmation);
                     break;
-               //借方扣除
+                //借方扣除
                 case AccountDebited msg:
                     //转换成等待借方确认
                     _behavior.Become(AwaitingCreditConfirmation);
@@ -50,7 +50,7 @@ namespace P100_Saga
                     break;
                 //贷方存入
                 case AccountCredited _:
-                 //借方回滚
+                //借方回滚
                 case DebitRolledBack _:
                 //转帐失败
                 case TransferFailed _:
@@ -70,11 +70,11 @@ namespace P100_Saga
             switch (context.Message)
             {
                 case Started msg:
+                    //自定义开始的行为
                     // default to Starting behavior
                     _behavior.Become(Starting);
-
-                    // recover state from persistence - if there are any events, the current behavior 
-                    // should change
+                    //从持久化库中恢复，如果当有一些事件，当前行为将会改变
+                    // recover state from persistence - if there are any events, the current behavior should change
                     await _persistence.RecoverStateAsync();
                     break;
                 case Stopping msg:
@@ -89,12 +89,13 @@ namespace P100_Saga
                     context.Parent.Tell(new UnknownResult(context.Self));
                     return;
                 case Terminated _ when _restarting || _stopping:
-                    // if the TransferProcess itself is restarting or stopping due to failure, we will receive a
-                    // Terminated message for any child actors due to them being stopped but we should not
+                    // if the TransferProcess itself is restarting or stopping due to failure, we will receive a Terminated message for any child actors due to them being stopped but we should not
                     // treat this as a failure of the saga, so return here to stop further processing
+                    //如果TransferProcess本身由于失败而重新启动或停止，我们将不会对其进行处理，因为我们没有将其视为saga故障，因此请返回此处以停止进一步处理
                     return;
                 default:
                     // simulate failures of the transfer process itself
+                    //模拟转换过程的失败
                     if (Fail())
                     {
                         throw new Exception();
@@ -104,6 +105,7 @@ namespace P100_Saga
 
             // pass through all messages to the current behavior. Note this includes the Started message we
             // may have just handled as what we should do when started depends on the current behavior
+            //将所有消息传递给当前行为。这是我们刚刚处理的已启动消息，因为我们应该开始执行的操作取决于当前行为
             await _behavior.ReceiveAsync(context);
         }
 
@@ -111,7 +113,7 @@ namespace P100_Saga
         {
             if (context.Message is Started)
             {
-                
+
                 var props = Actor.FromProducer(() => new AccountProxy(_from, sender => new Debit(-_amount, sender)));
                 context.SpawnNamed(props, "DebitAttempt");
                 await _persistence.PersistEventAsync(new TransferStarted());
@@ -166,6 +168,7 @@ namespace P100_Saga
             {
                 case Started _:
                     // if we are in this state when started then we need to recreate the TryCredit actor
+                    //如果我们在启动时处于这种状态，那么我们需要重新创建
                     var props_started = Actor.FromProducer(() => new AccountProxy(_to, sender => new Credit(+_amount, sender)));
                     context.SpawnNamed(props_started, "CreditAttempt");
                     break;
@@ -181,30 +184,36 @@ namespace P100_Saga
                 case Refused msg:
                     // sometimes a remote service might say it refuses to perform some operation. 
                     // This is different from a failure
+                    //有时远程服务可能会说它拒绝执行某些操作。
+                    //这与失败不同
+                    //代方拒绝
                     await _persistence.PersistEventAsync(new CreditRefused());
-                    // we have definately debited the _from account as it was confirmed, and we 
-                    // haven't creidted to _to account, so try and rollback
+                    // we have definately debited the _from account as it was confirmed, and we haven't creidted to _to account, so try and rollback
+                    //我们在借方帐户中扣除了，我们还没有在贷方帐户提存入，所以请尝试回滚
                     var props_refused = Actor.FromProducer(() => new AccountProxy(_from, sender => new Credit(+_amount, sender)));
                     context.SpawnNamed(props_refused, "RollbackDebit");
-
                     break;
                 case Terminated msg:
-                    // at this point, we do not know if the credit succeeded. The remote account has not 
-                    // confirmed success, but it might have succeeded then crashed, or failed to respond.
+                    // at this point, we do not know if the credit succeeded. The remote account has not confirmed success, but it might have succeeded then crashed, or failed to respond.
                     // Given that we don't know, just fail + escalate
+                    //鉴于我们不知道，只是失败+升级，我们没有成功，我们不知道成功然后崩溃，或未能回应
                     await _persistence.PersistEventAsync(new StatusUnknown());
                     StopAll(context);
                     break;
             }
         }
-
+        /// <summary>
+        /// 回滚
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private async Task RollingBackDebit(IContext context)
         {
             switch (context.Message)
             {
                 case Started _:
                     // if we are in this state when started then we need to recreate the TryCredit actor
-
+                    //如果我们在启动时处于这种状态，那么我们需要重新创建
                     var props_started = Actor.FromProducer(() => new AccountProxy(_from, sender => new Credit(+_amount, sender)));
                     context.SpawnNamed(props_started, $"RollbackDebit");
                     break;
@@ -214,7 +223,7 @@ namespace P100_Saga
                     context.Parent.Tell(new FailedButConsistentResult(context.Self));
                     StopAll(context);
                     break;
-                case Refused _: // in between making the credit and debit, the _from account has started refusing!! :O
+                case Refused _: // in between making the credit and debit, the _from account has started refusing!! :O 在进行信用卡和借记卡之间，_来自帐户已开始拒绝!!：O
                 case Terminated _:
                     await _persistence.PersistEventAsync(new TransferFailed($"Unable to rollback process. {_from.Id} is owed {_amount}"));
                     await _persistence.PersistEventAsync(new EscalateTransfer($"{_from.Id} is owed {_amount}"));
