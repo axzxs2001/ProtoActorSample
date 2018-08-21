@@ -104,7 +104,9 @@ namespace P100_Saga
             }
             //繁忙
             if (Busy())
+            {
                 replyTo.Tell(new ServiceUnavailable());
+            }
 
             // generate the behavior to be used whilst processing this message
             //生成处理此消息时要使用的行为

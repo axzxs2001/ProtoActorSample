@@ -8,17 +8,56 @@ namespace P100_Saga
 {
     class TransferProcess : IActor
     {
+        /// <summary>
+        /// 转出帐户
+        /// </summary>
         private readonly PID _from;
+        /// <summary>
+        /// 转入帐户
+        /// </summary>
         private readonly PID _to;
+        /// <summary>
+        /// 额度
+        /// </summary>
         private readonly decimal _amount;
+        /// <summary>
+        /// 随机类
+        /// </summary>
         private readonly Random _random;
+        /// <summary>
+        /// 有效性
+        /// </summary>
         private readonly double _availability;
+        /// <summary>
+        /// 持久化对象
+        /// </summary>
         private readonly Persistence _persistence;
-        private readonly Behavior _behavior = new Behavior();
+        /// <summary>
+        /// 行为
+        /// </summary>
+        private readonly Behavior _behavior;
+        /// <summary>
+        /// 重新开始中
+        /// </summary>
         private bool _restarting;
+        /// <summary>
+        /// 停止中
+        /// </summary>
         private bool _stopping;
+        /// <summary>
+        /// 完成处理
+        /// </summary>
         private bool _processCompleted;
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="from">转出帐户</param>
+        /// <param name="to">转入帐户</param>
+        /// <param name="amount">额度</param>
+        /// <param name="provider">持久化</param>
+        /// <param name="persistenceId">持久化ID</param>
+        /// <param name="random">随机类</param>
+        /// <param name="availability">有效性</param>
         public TransferProcess(PID from, PID to, decimal amount, IProvider provider, string persistenceId, Random random, double availability)
         {
             _from = from;
@@ -26,6 +65,7 @@ namespace P100_Saga
             _amount = amount;
             _random = random;
             _availability = availability;
+            _behavior = new Behavior();
             _persistence = Persistence.WithEventSourcing(provider, persistenceId, ApplyEvent);
         }
 
@@ -113,7 +153,6 @@ namespace P100_Saga
         {
             if (context.Message is Started)
             {
-
                 var props = Actor.FromProducer(() => new AccountProxy(_from, sender => new Debit(-_amount, sender)));
                 context.SpawnNamed(props, "DebitAttempt");
                 await _persistence.PersistEventAsync(new TransferStarted());
