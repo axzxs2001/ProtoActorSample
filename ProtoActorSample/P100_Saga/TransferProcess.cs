@@ -65,7 +65,7 @@ namespace P100_Saga
             _amount = amount;
             _random = random;
             _availability = availability;
-            _behavior = new Behavior();
+            _behavior = new Behavior();           
             _persistence = Persistence.WithEventSourcing(provider, persistenceId, ApplyEvent);
         }
 
@@ -214,6 +214,10 @@ namespace P100_Saga
                 case OK msg:
                     decimal fromBalance = await _from.RequestAsync<decimal>(new GetBalance(), TimeSpan.FromMilliseconds(2000));
                     decimal toBalance = await _to.RequestAsync<decimal>(new GetBalance(), TimeSpan.FromMilliseconds(2000));
+
+                    //decimal fromBalance = await _from.RequestAsync<decimal>(new GetBalance(), TimeSpan.FromSeconds(2000));
+                    //decimal toBalance = await _to.RequestAsync<decimal>(new GetBalance(), TimeSpan.FromSeconds(2000));
+
                     //贷方存入
                     await _persistence.PersistEventAsync(new AccountCredited());
                     await _persistence.PersistEventAsync(new TransferCompleted(_from, fromBalance, _to, toBalance));

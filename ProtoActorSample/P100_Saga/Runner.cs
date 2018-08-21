@@ -1,5 +1,7 @@
-﻿using P100_Saga.Messages;
+﻿using Microsoft.Data.Sqlite;
+using P100_Saga.Messages;
 using Proto;
+using Proto.Persistence.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -60,8 +62,8 @@ namespace P100_Saga
         /// <summary>
         /// 内存持久化提供者
         /// </summary>
-        private InMemoryProvider _inMemoryProvider;
-
+        // private InMemoryProvider _inMemoryProvider;
+        private SqliteProvider _inMemoryProvider;
         /// <summary>
         /// 
         /// </summary>
@@ -114,7 +116,10 @@ namespace P100_Saga
                     break;
                 case Started _:
                     var random = new Random();
-                    _inMemoryProvider = new InMemoryProvider();
+
+                    var dbfile = @"C:\MyFile\Source\Repos\ProtoActorSample\ProtoActorSample\P100_Saga\data.sqlite";
+                    var sqliteProvider = new SqliteProvider(new SqliteConnectionStringBuilder() { DataSource = dbfile });
+                    _inMemoryProvider = sqliteProvider;// new InMemoryProvider();
 
                     for (int i = 1; i <= _numberOfIterations; i++)
                     {
@@ -181,15 +186,15 @@ namespace P100_Saga
 
                 if (_outputEventStream)
                 {
-                    foreach (var stream in _inMemoryProvider.Events)
-                    {
-                        Console.WriteLine();
-                        Console.WriteLine($"Event log for {stream.Key}");
-                        foreach (var @event in stream.Value)
-                        {
-                            Console.WriteLine(@event.Value);
-                        }
-                    }
+                    //foreach (var stream in _inMemoryProvider.Events)
+                    //{
+                    //    Console.WriteLine();
+                    //    Console.WriteLine($"Event log for {stream.Key}");
+                    //    foreach (var @event in stream.Value)
+                    //    {
+                    //        Console.WriteLine(@event.Value);
+                    //    }
+                    //}
                 }
             }
         }

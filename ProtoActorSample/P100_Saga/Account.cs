@@ -2,7 +2,6 @@
 using Proto;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -55,14 +54,16 @@ namespace P100_Saga
             switch (context.Message)
             {
                 //贷方
-                case Credit msg when AlreadyProcessed(msg.ReplyTo):
-                    return Reply(msg.ReplyTo);
+                case Credit msg when _processedMessages.ContainsKey(msg.ReplyTo):
+                    msg.ReplyTo.Tell(_processedMessages[msg.ReplyTo]);
+                    return Actor.Done;
                 //贷方
                 case Credit msg:
                     return AdjustBalance(msg.ReplyTo, msg.Amount);
                 //借方
-                case Debit msg when AlreadyProcessed(msg.ReplyTo):
-                    return Reply(msg.ReplyTo);
+                case Debit msg when _processedMessages.ContainsKey(msg.ReplyTo):
+                    msg.ReplyTo.Tell(_processedMessages[msg.ReplyTo]);
+                    return Actor.Done;
                 //借方
                 case Debit msg when msg.Amount + _balance >= 0:
                     return AdjustBalance(msg.ReplyTo, msg.Amount);
@@ -78,11 +79,7 @@ namespace P100_Saga
             return Actor.Done;
         }
 
-        private Task Reply(PID replyTo)
-        {
-            replyTo.Tell(_processedMessages[replyTo]);
-            return Actor.Done;
-        }
+      
 
         /// <summary>
         /// 调整帐户
@@ -96,6 +93,7 @@ namespace P100_Saga
         /// </summary>
         private Task AdjustBalance(PID replyTo, decimal amount)
         {
+            #region
             //永久拒绝
             if (RefusePermanently())
             {
@@ -120,7 +118,7 @@ namespace P100_Saga
             // simulate potential long-running process
             //模拟潜在的长期运行过程
             Thread.Sleep(_random.Next(0, 150));
-
+            #endregion
             _balance += amount;
             _processedMessages.Add(replyTo, new OK());
 
@@ -153,7 +151,7 @@ namespace P100_Saga
             var comparsion = _random.NextDouble() * 100;
             return comparsion <= _refusalProbability;
         }
-       
+
         /// <summary>
         /// 确定处理行为
         /// </summary>
@@ -167,15 +165,7 @@ namespace P100_Saga
             }
             return Behavior.ProcessSuccessfully;
         }
-        /// <summary>
-        /// 已经处理
-        /// </summary>
-        /// <param name="replyTo"></param>
-        /// <returns></returns>
-        private bool AlreadyProcessed(PID replyTo)
-        {
-            return _processedMessages.ContainsKey(replyTo);
-        }
+     
         /// <summary>
         /// 处理结果
         /// </summary>

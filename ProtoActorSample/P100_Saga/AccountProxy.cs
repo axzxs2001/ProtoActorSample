@@ -24,6 +24,7 @@ namespace P100_Saga
                     // imagine this is some sort of remote call rather than a local actor call
                     //想象这是某种远程调用而不是本地Actor调用
                     _target.Tell(_createMessage(context.Self));
+                    //context.SetReceiveTimeout(TimeSpan.FromSeconds(100));
                     context.SetReceiveTimeout(TimeSpan.FromMilliseconds(100));
                     break;
                 case OK msg:
