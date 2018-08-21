@@ -17,18 +17,32 @@ namespace P008_Persistence
             var sqliteProvider = new SqliteProvider(new SqliteConnectionStringBuilder() { DataSource = dbfile });
             var props = Actor.FromProducer(() => new DataActor(sqliteProvider, actorid));
             var pid = Actor.Spawn(props);
-            for (int i = 0; i < 10; i++)
-            {
-                Console.ReadLine();
-                var random = new Random();
-                var no = random.Next(5, 15);
-                Console.WriteLine(no);
-                pid.Tell(new Data { Amount = no });
-            }
 
-            Console.ReadLine();
-            //完成处理后清理持久化的操作          
+            var result = true;
+            while (result)
+            {
+                Console.WriteLine("1、Tell  2、删除持久化  3、退出");
+
+                switch (Console.ReadLine())
+                {
+                    case "1":
+                        var random = new Random();
+                        var no = random.Next(5, 15);
+                        Console.WriteLine(no);
+                        pid.Tell(new Data { Amount = no });
+                        break;
+                    case "2":
+                        //完成处理后清理持久化的操作          
+                        sqliteProvider.DeleteEventsAsync(actorid, 10).Wait();
+                        break;
+                    case "3":
+                        result = false;
+                        break;
+                }
+            }
             sqliteProvider.DeleteEventsAsync(actorid, 10).Wait();
+            
+
         }
     }
     public class Data
@@ -50,6 +64,7 @@ namespace P008_Persistence
             {
                 case Data msg:
                     _value = _value + msg.Amount;
+                    Console.WriteLine($"累计：{_value}");
                     break;
             }
         }
