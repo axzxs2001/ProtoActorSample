@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="2.1.0" />
     <PackageReference Include="Proto.Actor" Version="0.1.16" />
     <PackageReference Include="Proto.Persistence" Version="0.1.16" />
     <PackageReference Include="Proto.Persistence.Sqlite" Version="0.1.16" />
