@@ -9,5 +9,12 @@ namespace P100_Saga.Messages
     /// </summary>
     class InsufficientFunds
     {
+        /// <summary>
+        /// 余额不足
+        /// </summary>
+        public InsufficientFunds()
+        {
+
+        }
     }
 }

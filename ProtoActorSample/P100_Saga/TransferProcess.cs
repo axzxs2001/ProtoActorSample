@@ -266,7 +266,7 @@ namespace P100_Saga
                     context.Parent.Tell(new FailedButConsistentResult(context.Self));
                     StopAll(context);
                     break;
-                case Refused _: // in between making the credit and debit, the _from account has started refusing!! :O 在进行信用卡和借记卡之间，_来自帐户已开始拒绝!!：O
+                case Refused _: // in between making the credit and debit, the _from account has started refusing!! :O 在进行贷方和借记卡之间，借方帐户已拒绝!!：O
                 case Terminated _:
                     await _persistence.PersistEventAsync(new TransferFailed($"Unable to rollback process. {_from.Id} is owed {_amount}"));
                     await _persistence.PersistEventAsync(new EscalateTransfer($"{_from.Id} is owed {_amount}"));

@@ -7,24 +7,23 @@ namespace P100_Saga
     {
         static void Main(string[] args)
         {
-            while (true)
-            {
-                Console.WriteLine("Starting");
-                var numberOfTransfers = 1;
-                var uptime =  99.99;
-                var retryAttempts = 0;
-                var refusalProbability = 0;// 0.01;
-                var busyProbability = 0;// 0.01;
 
-                var props = Actor.FromProducer(() => new Runner(numberOfTransfers, uptime, refusalProbability, busyProbability, retryAttempts, false))
-                    .WithChildSupervisorStrategy(new OneForOneStrategy((pid, reason) => SupervisorDirective.Restart, retryAttempts, null));
+            Console.WriteLine("Starting");
+            var numberOfTransfers = 20;
+            var uptime = 59.99;
+            var retryAttempts = 0;
+            var refusalProbability = 0.31;
+            var busyProbability = 0.81;
 
-                Console.WriteLine("Spawning runner");
-                var runner = Actor.SpawnNamed(props, "runner");
-               
-                Console.ReadLine();
-                runner.Stop();
-            }
+            var props = Actor.FromProducer(() => new Runner(numberOfTransfers, uptime, refusalProbability, busyProbability, retryAttempts, false))
+                .WithChildSupervisorStrategy(new OneForOneStrategy((pid, reason) => SupervisorDirective.Restart, retryAttempts, null));
+
+            Console.WriteLine("Spawning runner");
+            var runner = Actor.SpawnNamed(props, "runner");
+
+            Console.ReadLine();
+            runner.Stop();
+
         }
     }
 }

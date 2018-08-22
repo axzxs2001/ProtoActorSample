@@ -9,7 +9,6 @@ namespace P100_Saga
     {
         private readonly PID _target;
         private readonly Func<PID, object> _createMessage;
-
         public AccountProxy(PID target, Func<PID, object> createMessage)
         {
             _target = target;
@@ -35,7 +34,8 @@ namespace P100_Saga
                     context.CancelReceiveTimeout();
                     context.Parent.Tell(msg);
                     break;
-                // This emulates a failed remote call
+                //This emulates a failed remote call
+                //这里是模拟远程失败调用
                 case InsufficientFunds _:
                 case InternalServerError _:
                 case ReceiveTimeout _:
