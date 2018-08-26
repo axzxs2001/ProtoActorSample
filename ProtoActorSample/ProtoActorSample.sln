@@ -3,11 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2047
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P001_HelloWorld", "HelloWorld\P001_HelloWorld.csproj", "{33DF5009-FFBB-4782-ADF4-90E51077CA6B}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5A2B6CEC-4693-4AF4-A154-4C0A0EE9A020}"
 	ProjectSection(SolutionItems) = preProject
 		Proto.Actor.pptx = Proto.Actor.pptx
+		proto文档.docx = proto文档.docx
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P002_CustomProps", "P002_CustomProps\P002_CustomProps.csproj", "{E4BE6ECE-5E9E-4944-BC3C-DC4F549167F5}"
@@ -32,7 +31,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P009_Client", "P009_Client\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P009_Server", "P009_Server\P009_Server.csproj", "{080B7EE4-E954-44A6-A590-2CC78BC19EC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P009_Lib", "P009_Lib\P009_Lib.csproj", "{0DD93976-9D0D-4971-AB7C-63A9DF5AA6F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P009_Lib", "P009_Lib\P009_Lib.csproj", "{0DD93976-9D0D-4971-AB7C-63A9DF5AA6F4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P001_HelloWorld", "P001_HelloWorld\P001_HelloWorld.csproj", "{AE10DAA5-5981-4437-989D-00ED613A1B2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,10 +41,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{33DF5009-FFBB-4782-ADF4-90E51077CA6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{33DF5009-FFBB-4782-ADF4-90E51077CA6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{33DF5009-FFBB-4782-ADF4-90E51077CA6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{33DF5009-FFBB-4782-ADF4-90E51077CA6B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E4BE6ECE-5E9E-4944-BC3C-DC4F549167F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E4BE6ECE-5E9E-4944-BC3C-DC4F549167F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4BE6ECE-5E9E-4944-BC3C-DC4F549167F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -88,6 +85,10 @@ Global
 		{0DD93976-9D0D-4971-AB7C-63A9DF5AA6F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0DD93976-9D0D-4971-AB7C-63A9DF5AA6F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0DD93976-9D0D-4971-AB7C-63A9DF5AA6F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE10DAA5-5981-4437-989D-00ED613A1B2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE10DAA5-5981-4437-989D-00ED613A1B2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE10DAA5-5981-4437-989D-00ED613A1B2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE10DAA5-5981-4437-989D-00ED613A1B2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
