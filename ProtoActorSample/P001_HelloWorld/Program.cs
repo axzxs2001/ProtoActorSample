@@ -19,6 +19,10 @@ namespace P001_HelloWorld
                 Who = "Alex"
             });
             Console.ReadLine();
+           
+            pid.Stop();
+
+            Console.ReadLine();
         }
     }
     //传递对象
@@ -33,6 +37,10 @@ namespace P001_HelloWorld
         public Task ReceiveAsync(IContext context)
         {
             var msg = context.Message;
+            if(msg is Started started)
+            {                
+                Console.WriteLine("Started");
+            }
             if (msg is Hello hello)
             {
                 Console.WriteLine($"Hello {hello.Who}");
