@@ -7,8 +7,7 @@ namespace P001_HelloWorld
     class Program
     {
         static void Main(string[] args)
-        {        
-
+        {
             //Actor产生一个props（道具）
             var props = Actor.FromProducer(() => new HelloActor());
             //从props衍生pid，pid代理一个actor的地址
@@ -19,9 +18,7 @@ namespace P001_HelloWorld
                 Who = "Alex"
             });
             Console.ReadLine();
-           
             pid.Stop();
-
             Console.ReadLine();
         }
     }
@@ -35,15 +32,15 @@ namespace P001_HelloWorld
     {
         //被调用
         public Task ReceiveAsync(IContext context)
-        {
-            var msg = context.Message;
-            if(msg is Started started)
-            {                
-                Console.WriteLine("Started");
-            }
-            if (msg is Hello hello)
+        {        
+            switch (context.Message)
             {
-                Console.WriteLine($"Hello {hello.Who}");
+                case Started started:
+                    Console.WriteLine("Started");
+                    break;
+                case Hello hello:
+                    Console.WriteLine($"Hello {hello.Who}");
+                    break;
             }
             return Actor.Done;
         }

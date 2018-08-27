@@ -9,7 +9,42 @@ namespace P004_PID
     {
         static void Main(string[] args)
         {
-            var props = Actor.FromProducer(() => new MyActor());
+           // var props = Actor.FromProducer(() => new MyActor());
+
+            var props = new Props()
+               //用道具代理返回一个IActor实例
+               .WithProducer(() => new MyActor())               
+               .WithReceiveMiddleware(
+               next => async c =>
+               {
+                   Console.WriteLine($"Receive中间件 1 开始，{c.Message.GetType()}:{c.Message}");
+                   await next(c);
+                   Console.WriteLine($"Receive中间件 1 结束，{c.Message.GetType()}:{c.Message}");
+               },
+               next => async c =>
+               {
+                   Console.WriteLine($"Receive中间件 2 开始，{c.Message.GetType()}:{c.Message}");
+                   await next(c);
+                   Console.WriteLine($"Receive中间件 2 结束，{c.Message.GetType()}:{c.Message}");
+               })
+               .WithSenderMiddleware(
+               next => async (c, target, envelope) =>
+               {
+                   Console.WriteLine($"Sender中间件 1 开始, {c.Message.GetType()}:{c.Message}");
+                   await next(c, target, envelope);
+                   Console.WriteLine($"Sender中间件 1 结束，{c.Message.GetType()}:{c.Message}");
+               },
+               next => async (c, target, envelope) =>
+               {
+                   Console.WriteLine($"Sender中间件 2 开始，{c.Message.GetType()}:{c.Message}");
+                   await next(c, target, envelope);
+                   Console.WriteLine($"Sender中间件 2 结束，{c.Message.GetType()}:{c.Message}");
+               })
+               // 默认的 spawner 构造  Actor, Context 和 Process
+               .WithSpawner(Props.DefaultSpawner);
+
+
+
             var pid = Actor.Spawn(props);
             while (true)
             {
@@ -52,11 +87,11 @@ namespace P004_PID
                         Console.WriteLine("接收到：" + request.RequestType + "," + request.Time + ":" + request.Name);
                         break;
                     case "two-way-1"://context.Sender= context.Self为自己
-                        Console.WriteLine("接收到：" + request.RequestType + "," + request.Time + ":" + request.Name);
+                        Console.WriteLine("接收到：" + request.RequestType + "," + request.Time + ":" + request.Name);                      
                         context.Respond(new Response() { Time = DateTime.Now, Name = "服务端应答" });
                         break;
                     case "two-way-2"://context.Sender!= context.Self为新实例
-                        Console.WriteLine("接收到：" + request.RequestType + "," + request.Time + ":" + request.Name);
+                        Console.WriteLine("接收到：" + request.RequestType + "," + request.Time + ":" + request.Name);                       
                         context.Respond(new Response() { Time = DateTime.Now, Name = "服务端应答" });
                         break;
                 }

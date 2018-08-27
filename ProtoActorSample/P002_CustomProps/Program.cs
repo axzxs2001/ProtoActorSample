@@ -10,7 +10,7 @@ namespace P002_CustomProps
         static void Main(string[] args)
         {
             var props = new Props()
-                // 用道具代理返回一个IActor实例
+                //用道具代理返回一个IActor实例
                 .WithProducer(() => new MyActor())
                 //默认调度器用线程池，邮箱中最多300个消息吞吐量
                 .WithDispatcher(new ThreadPoolDispatcher { Throughput = 300 })
@@ -25,40 +25,40 @@ namespace P002_CustomProps
                 .WithReceiveMiddleware(
                 next => async c =>
                 {
-                    Console.WriteLine($"Receive middleware 1 enter {c.Message.GetType()}:{c.Message}");
+                    Console.WriteLine($"Receive中间件 1 开始，{c.Message.GetType()}:{c.Message}");
                     await next(c);
-                    Console.WriteLine($"Receive middleware 1 exit");
+                    Console.WriteLine($"Receive中间件 1 结束，{c.Message.GetType()}:{c.Message}");
                 },
                 next => async c =>
                 {
-                    Console.WriteLine($"Receive middleware 2 enter {c.Message.GetType()}:{c.Message}");
+                    Console.WriteLine($"Receive中间件 2 开始，{c.Message.GetType()}:{c.Message}");
                     await next(c);
-                    Console.WriteLine($"Receive middleware 2 exit");
+                    Console.WriteLine($"Receive中间件 2 结束，{c.Message.GetType()}:{c.Message}");
                 })
                 .WithSenderMiddleware(
                 next => async (c, target, envelope) =>
                 {
-                    Console.WriteLine($"Sender middleware 1 enter {c.Message.GetType()}:{c.Message}");
+                    Console.WriteLine($"Sender中间件 1 开始, {c.Message.GetType()}:{c.Message}");
                     await next(c, target, envelope);
-                    Console.WriteLine($"Sender middleware 1 enter {c.Message.GetType()}:{c.Message}");
+                    Console.WriteLine($"Sender中间件 1 结束，{c.Message.GetType()}:{c.Message}");
                 },
                 next => async (c, target, envelope) =>
                 {
-                    Console.WriteLine($"Sender middleware 2 enter {c.Message.GetType()}:{c.Message}");
+                    Console.WriteLine($"Sender中间件 2 开始，{c.Message.GetType()}:{c.Message}");
                     await next(c, target, envelope);
-                    Console.WriteLine($"Sender middleware 2 enter {c.Message.GetType()}:{c.Message}");
+                    Console.WriteLine($"Sender中间件 2 结束，{c.Message.GetType()}:{c.Message}");
                 })
                 // 默认的 spawner 构造  Actor, Context 和 Process
                 .WithSpawner(Props.DefaultSpawner);
 
             //从props衍生pid，pid代理一个actor的地址
-            var pid = Actor.Spawn(props);
+            var pid = Actor.Spawn(props);       
             //把Hello对象交给HelloActor处理
             pid.Tell(new MyEntity
             {
-                Message = "this is message"
+                Message = "我是MyEntity的Message，请求"
             });
-            Console.ReadLine();
+            Console.ReadLine();    
         }
     }
 
@@ -69,11 +69,11 @@ namespace P002_CustomProps
             if (context.Message is MyEntity myEntity)
             {
                 Console.WriteLine(myEntity.Message);
+                context.Tell(context.Sender, new MyEntity() { Message = "我是MyEntity的Message,应答" });
             }
             return Actor.Done;
         }
     }
-
     public class MyEntity
     {
         public string Message { get; set; }
