@@ -12,10 +12,8 @@ namespace P005_Mailboxes
             var props = new Props()
                 // 用道具代理返回一个IActor实例
                 .WithProducer(() => new MyActor())
-
                 //默认邮箱使用无界队列
                 .WithMailbox(() => UnboundedMailbox.Create(new MyMailboxStatistics()))
-
                 // 默认的 spawner 构造  Actor, Context 和 Process
                 .WithSpawner(Props.DefaultSpawner);
 
@@ -29,7 +27,6 @@ namespace P005_Mailboxes
             Console.ReadLine();
         }
     }
-
     public class MyActor : IActor
     {
         public Task ReceiveAsync(IContext context)
@@ -41,16 +38,14 @@ namespace P005_Mailboxes
             return Actor.Done;
         }
     }
-
     public class MyEntity
     {
         public string Message { get; set; }
     }
-
     public class MyMailboxStatistics : IMailboxStatistics
     {
         public void MailboxEmpty()
-        {
+        {            
             Console.WriteLine("邮箱MailboxEmpty");
         }
 
