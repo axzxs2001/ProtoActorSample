@@ -24,12 +24,8 @@ namespace P006_Supervision
 
                 Console.ReadLine();
                 pid.Request(new Recoverable(), pid);
-
-
                 // Console.ReadLine();
                 // pid.Request(new Fatal(), pid);
-
-
             }
 
         }

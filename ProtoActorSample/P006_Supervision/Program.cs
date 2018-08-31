@@ -10,7 +10,8 @@ namespace P006_Supervision
     {
         static void Main(string[] args)
         {
-            var props = Actor.FromProducer(() => new ShopingCatActor()).WithChildSupervisorStrategy(new OneForOneStrategy(SupervisorMode.Decide, 3, TimeSpan.FromSeconds(5)));
+            //设置监督策略，指向SupervisiorMode方法，重启次数为3，两次之间间隔1s
+            var props = Actor.FromProducer(() => new ShopingCatActor()).WithChildSupervisorStrategy(new OneForOneStrategy(SupervisorMode.Decide, 3, TimeSpan.FromSeconds(1)));
             var pid = Actor.Spawn(props);
             var user = new User { UserName = "gsw" };
 
@@ -25,27 +26,34 @@ namespace P006_Supervision
                 Console.WriteLine("---------------------end------------------");
                 Console.ReadLine();
                 pid.Request(user, pid);
-
             }
-
         }
     }
+    /// <summary>
+    /// Supervisor 模式
+    /// </summary>
     class SupervisorMode
     {
+        /// <summary>
+        /// 用来处理异常发生的后续操作
+        /// </summary>
+        /// <param name="pid">PID</param>
+        /// <param name="reason">异常原因，Exception类型</param>
+        /// <returns></returns>
         public static SupervisorDirective Decide(PID pid, Exception reason)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(reason.Message + "   " + pid);
-            Console.ResetColor();
+            Console.WriteLine("   异常发生：" + reason.Message + "   " + pid);
             switch (reason)
             {
+                //重新开始的异常
                 case RecoverableException _:
                     return SupervisorDirective.Restart;
+                //停止异常
                 case FatalException _:
                     return SupervisorDirective.Stop;
+                //其他都上报
                 default:
                     return SupervisorDirective.Escalate;
-
             }
         }
     }
@@ -58,7 +66,7 @@ namespace P006_Supervision
         public ShopingCatActor()
         {
             _shopingCat = new ShopingCat();
-            Console.WriteLine("*******************ctor ShopingCatActor");
+            Console.WriteLine("*******************actor ShopingCatActor************************");
         }
         public Task ReceiveAsync(IContext context)
         {
@@ -76,8 +84,6 @@ namespace P006_Supervision
             {
                 case User user:
                     childPid.Request(_shopingCat, childPid);
-                    //var result = childPid.RequestAsync<int>(_shopingCat).Result;
-                    //Console.WriteLine($"result={result}");
                     user.ShopingCat = _shopingCat;
                     break;
             }
@@ -88,12 +94,7 @@ namespace P006_Supervision
     /// 商品actor
     /// </summary>
     class GoodsActor : IActor
-    {
-        public GoodsActor()
-        {
-            Console.WriteLine("***********************ctor GoodsActor");
-        }
-
+    { 
         public Task ReceiveAsync(IContext context)
         {
             switch (context.Message)
@@ -101,9 +102,9 @@ namespace P006_Supervision
                 case ShopingCat shopingCat:
 
                     var goods = new Goods { Name = "红茶", Price = 3.0m, Describe = "统一" };
+                    //用来随机产生异常
                     var random = new Random();
                     goods.Quantity = random.Next(1, 3) - 1;
-                    //context.Respond(goods.Quantity);
                     if (goods.Quantity <= 0)
                     {
                         throw new RecoverableException("数量不能小于等于0");
@@ -113,7 +114,6 @@ namespace P006_Supervision
                         shopingCat.Goodses.Add(goods);
                         Console.WriteLine($"添加 {goods} 到购物车里");
                     }
-                  
                     break;
             }
             return Actor.Done;
