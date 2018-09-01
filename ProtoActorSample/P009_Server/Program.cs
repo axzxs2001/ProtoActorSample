@@ -16,13 +16,15 @@ namespace P009_Server
             Console.Title = "服务端";
             Console.WriteLine("回车开始");
             Console.ReadLine();
-            //设置序列化类型
+            //设置序列化类型并注册
             var wire = new WireSerializer(new[] { typeof(HelloRequest), typeof(HelloResponse) });
             Serialization.RegisterSerializer(wire, true);
 
-            var props = Actor.FromProducer(() => new HelloQuestActor());         
+            var props = Actor.FromProducer(() => new HelloQuestActor());
+            //注册一个为hello类别的          
             Remote.RegisterKnownKind("hello", props);
-            Remote.Start("127.0.0.1", 12000);
+            //服务端监控端口5001
+            Remote.Start("127.0.0.1", 5001);
             Console.WriteLine("服务端开始……");
             Console.ReadLine();
         }
@@ -38,7 +40,7 @@ namespace P009_Server
                     Console.WriteLine(msg.Message);
                     context.Respond(new HelloResponse
                     {
-                        Message = "回应：我是服务端",
+                        Message = $"回应：我是服务端【{DateTime.Now}】",
                     });
                     break;
             }
