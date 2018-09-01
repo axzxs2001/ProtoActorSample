@@ -16,30 +16,33 @@ namespace P008_Persistence
             var actorid = "myactorid";
             var dbfile = @"C:\MyFile\Source\Repos\ProtoActorSample\ProtoActorSample\P008_Persistence\data.sqlite";
             var sqliteProvider = new SqliteProvider(new SqliteConnectionStringBuilder() { DataSource = dbfile });
-
-            Console.WriteLine("1、事件溯源   2、快照   3、带快照的事件溯源");
-            switch (Console.ReadLine())
+            while (true)
             {
-                case "1":
-                    CallES(actorid, sqliteProvider);
-                    break;
-                case "2":
-                    CallSN(actorid, sqliteProvider);
-                    break;
-                case "3":
-                    CallES_SN(actorid, sqliteProvider);
-                    break;
+                Console.WriteLine("1、事件溯源   2、快照   3、带快照的事件溯源  4、退出");
+                switch (Console.ReadLine())
+                {
+                    case "1":
+                        CallEventSource(actorid, sqliteProvider);
+                        break;
+                    case "2":
+                        CallSnapShoot(actorid, sqliteProvider);
+                        break;
+                    case "3":
+                        CallSnapShootEventSource(actorid, sqliteProvider);
+                        break;
+                    case "4":
+                        return;
+                }
             }
-
         }
         /// <summary>
         /// 事件溯源
         /// </summary>
         /// <param name="actorid"></param>
         /// <param name="sqliteProvider"></param>
-        private static void CallES(string actorid, SqliteProvider sqliteProvider)
-        {
-            var props = Actor.FromProducer(() => new ESDataActor(sqliteProvider, actorid));
+        private static void CallEventSource(string actorid, SqliteProvider sqliteProvider)
+        {          
+            var props = Actor.FromProducer(() => new EventSourceDataActor(sqliteProvider, actorid));
             var pid = Actor.Spawn(props);
             var result = true;
             while (result)
@@ -51,24 +54,28 @@ namespace P008_Persistence
                     case "1":
                         var random = new Random();
                         var no = random.Next(5, 15);
-                        Console.WriteLine(no);
+                        Console.WriteLine($"随机产生的数字：{no}");
                         pid.Tell(new Data { Amount = no });
                         break;
                     case "2":
                         //完成处理后清理持久化的操作          
-                        sqliteProvider.DeleteEventsAsync(actorid, 10).Wait();
+                        sqliteProvider.DeleteEventsAsync(actorid, 100).Wait();
                         break;
                     case "3":
                         result = false;
                         break;
                 }
-            }
-            sqliteProvider.DeleteEventsAsync(actorid, 10).Wait();
+            }       
         }
 
-        private static void CallSN(string actorid, SqliteProvider sqliteProvider)
+        /// <summary>
+        /// 快照
+        /// </summary>
+        /// <param name="actorid"></param>
+        /// <param name="sqliteProvider"></param>
+        private static void CallSnapShoot(string actorid, SqliteProvider sqliteProvider)
         {
-            var props = Actor.FromProducer(() => new SNDataActor(sqliteProvider, actorid));
+            var props = Actor.FromProducer(() => new SnapShootDataActor(sqliteProvider, actorid));
             var pid = Actor.Spawn(props);
             var result = true;
             while (result)
@@ -80,24 +87,28 @@ namespace P008_Persistence
                     case "1":
                         var random = new Random();
                         var no = random.Next(5, 15);
-                        Console.WriteLine(no);
+                        Console.WriteLine($"随机产生的数字：{no}");
                         pid.Tell(new Data { Amount = no });
                         break;
                     case "2":
                         //完成处理后清理持久化的操作          
-                        sqliteProvider.DeleteEventsAsync(actorid, 10).Wait();
+                        sqliteProvider.DeleteSnapshotsAsync(actorid, 100).Wait();
                         break;
                     case "3":
                         result = false;
                         break;
                 }
             }
-            sqliteProvider.DeleteEventsAsync(actorid, 10).Wait();
+            
         }
-
-        private static void CallES_SN(string actorid, SqliteProvider sqliteProvider)
+        /// <summary>
+        /// 快照事件溯源
+        /// </summary>
+        /// <param name="actorid"></param>
+        /// <param name="sqliteProvider"></param>
+        private static void CallSnapShootEventSource(string actorid, SqliteProvider sqliteProvider)
         {
-            var props = Actor.FromProducer(() => new ES_SNDataActor(sqliteProvider, sqliteProvider, actorid));
+            var props = Actor.FromProducer(() => new SnapShootEventSourceDataActor(sqliteProvider, sqliteProvider, actorid));
             var pid = Actor.Spawn(props);
             var result = true;
             while (result)
@@ -109,19 +120,19 @@ namespace P008_Persistence
                     case "1":
                         var random = new Random();
                         var no = random.Next(5, 15);
-                        Console.WriteLine(no);
+                        Console.WriteLine($"随机产生的数字：{no}");
                         pid.Tell(new Data { Amount = no });
                         break;
                     case "2":
                         //完成处理后清理持久化的操作          
-                        sqliteProvider.DeleteEventsAsync(actorid, 10).Wait();
+                        sqliteProvider.DeleteEventsAsync(actorid, 100).Wait();
+                        sqliteProvider.DeleteSnapshotsAsync(actorid, 100).Wait();
                         break;
                     case "3":
                         result = false;
                         break;
                 }
-            }
-            sqliteProvider.DeleteEventsAsync(actorid, 10).Wait();
+            }         
         }
     }
 
@@ -131,13 +142,14 @@ namespace P008_Persistence
     }
 
     #region 事件溯源
-    public class ESDataActor : IActor
+    public class EventSourceDataActor : IActor
     {
         private long _value = 0;
         private readonly Persistence _persistence;
 
-        public ESDataActor(IEventStore eventStore, string actorId)
+        public EventSourceDataActor(IEventStore eventStore, string actorId)
         {
+            //事件溯源持久化方式
             _persistence = Persistence.WithEventSourcing(eventStore, actorId, ApplyEvent);
         }
         private void ApplyEvent(Proto.Persistence.Event @event)
@@ -166,13 +178,14 @@ namespace P008_Persistence
     #endregion
 
     #region 快照
-    public class SNDataActor : IActor
+    public class SnapShootDataActor : IActor
     {
         private long _value = 0;
         private readonly Persistence _persistence;
 
-        public SNDataActor(ISnapshotStore snapshotStore, string actorId)
+        public SnapShootDataActor(ISnapshotStore snapshotStore, string actorId)
         {
+            //快照持久化方式
             _persistence = Persistence.WithSnapshotting(snapshotStore, actorId, ApplySnapshot);
         }
         private void ApplySnapshot(Proto.Persistence.Snapshot snapshot)
@@ -181,6 +194,7 @@ namespace P008_Persistence
             {
                 case long value:
                     _value = value;
+                    Console.WriteLine($"累计：{_value}");
                     break;
             }
         }
@@ -193,7 +207,7 @@ namespace P008_Persistence
                     break;
                 case Data msg:
                     _value = _value + msg.Amount;
-                    await _persistence.DeleteSnapshotsAsync(10);
+                    await _persistence.DeleteSnapshotsAsync(100);
                     await _persistence.PersistSnapshotAsync(_value);
                     break;
             }
@@ -202,14 +216,17 @@ namespace P008_Persistence
     #endregion
 
     #region 事件溯源and快照
-    public class ES_SNDataActor : IActor
+    public class SnapShootEventSourceDataActor : IActor
     {
         private long _value = 0;
         private readonly Persistence _persistence;
 
-        public ES_SNDataActor(IEventStore @event, ISnapshotStore snapshotStore, string actorId)
+        public SnapShootEventSourceDataActor(IEventStore  eventStore, ISnapshotStore snapshotStore, string actorId)
         {
-            _persistence = Persistence.WithEventSourcingAndSnapshotting(@event, snapshotStore, actorId, ApplyEvent, ApplySnapshot, new IntervalStrategy(10), () => { return _value; });
+            //注释快照策略
+            _persistence = Persistence.WithEventSourcingAndSnapshotting(eventStore, snapshotStore, actorId, ApplyEvent, ApplySnapshot, new IntervalStrategy(5), () => { return _value; });
+            //无快照策略
+            //_persistence = Persistence.WithEventSourcingAndSnapshotting(eventStore, snapshotStore, actorId, ApplyEvent, ApplySnapshot);
         }
         private void ApplyEvent(Proto.Persistence.Event @event)
         {
@@ -217,7 +234,7 @@ namespace P008_Persistence
             {
                 case Data msg:
                     _value = _value + msg.Amount;
-                    Console.WriteLine($"累计：{_value}");
+                    Console.WriteLine($"事件溯源累计：{_value}");
                     break;
             }
         }
@@ -227,6 +244,7 @@ namespace P008_Persistence
             {
                 case long value:
                     _value = value;
+                    Console.WriteLine($"快照累计：{_value}");
                     break;
             }
         }
@@ -239,18 +257,10 @@ namespace P008_Persistence
                     break;
                 case Data msg:
                     await _persistence.PersistEventAsync(new Data { Amount = msg.Amount });
-                    if (ShouldTakeSnapshot())
-                    {
-                        //await _persistence.DeleteSnapshotsAsync(10);
-                        await _persistence.PersistSnapshotAsync(_value);
-                    }
+                    //无快照策略时启用
+                    //await _persistence.PersistSnapshotAsync(_value);
                     break;
             }
-        }
-
-        private bool ShouldTakeSnapshot()
-        {
-            return true;
         }
     }
     #endregion
