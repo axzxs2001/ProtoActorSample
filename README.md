@@ -17,3 +17,5 @@ Proto.Actor Sample and PPT
     https://www.cnblogs.com/axzxs2001/p/9569146.html
 ### 8. 《通过C#学Proto.Actor模型》之Persistence
     https://www.cnblogs.com/axzxs2001/p/9569899.html
+### 9. 《通过C#学Proto.Actor模型》之Remote
+    https://www.cnblogs.com/axzxs2001/p/9570640.html
