@@ -10,15 +10,17 @@ namespace P007_Behaviors
         {
             var props = Actor.FromProducer(() => new LightBulb());
             var pid = Actor.Spawn(props);
-            var message = pid.RequestAsync<string>(new PressSwitch()).Result;
-            Console.WriteLine(message);
-            message = pid.RequestAsync<string>(new Touch()).Result;
-            Console.WriteLine(message);
-            message = pid.RequestAsync<string>(new PressSwitch()).Result;
-            Console.WriteLine(message);
-            message = pid.RequestAsync<string>(new Touch()).Result;
-            Console.WriteLine(message);
-            Console.ReadLine();
+            while (true)
+            {
+                Console.WriteLine("----------------------------");
+                Console.WriteLine("按开关");
+                Console.ReadLine();
+                var message = pid.RequestAsync<string>(new PressSwitch()).Result;
+                Console.WriteLine(message);
+
+                message = pid.RequestAsync<string>(new Touch()).Result;
+                Console.WriteLine(message);
+            }
         }
     }
 
@@ -29,61 +31,56 @@ namespace P007_Behaviors
         public LightBulb()
         {
             _behavior = new Behavior();
-            _behavior.Become(Off);
-        }  
+            //把Off方法放入栈
+            _behavior.BecomeStacked(Off);
+        }
         public Task ReceiveAsync(IContext context)
         {
+            //切换到behavior指定的方法,来充当ReceiveAsync
             return _behavior.ReceiveAsync(context);
         }
+        /// <summary>
+        /// 关
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private Task Off(IContext context)
         {
             switch (context.Message)
             {
                 case PressSwitch _:
-                    context.Respond("Turning on");
+                    context.Respond("打开");
                     _behavior.Become(On);
                     break;
                 case Touch _:
-                    context.Respond("Cold");
+                    context.Respond("凉的");
                     break;
             }
             return Actor.Done;
         }
+        /// <summary>
+        /// 开
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private Task On(IContext context)
         {
             switch (context.Message)
             {
                 case PressSwitch _:
-                    context.Respond("Turning off");
+                    context.Respond("关闭");
                     _behavior.Become(Off);
                     break;
                 case Touch _:
-                    context.Respond("Hot!");
-                    break;
-            }
-            return Actor.Done;
-        }
-        private Task Smashed(IContext context)
-        {
-            switch (context.Message)
-            {
-                case PressSwitch _:
-                    context.Respond(""); // nothing happens!
-                    break;
-                case Touch _:
-                    context.Respond("Owwww!");
-                    break;
-                case ReplaceBulb _:
-                    _behavior.Become(Off);
+                    context.Respond("烫手");
                     break;
             }
             return Actor.Done;
         }
     }
     class PressSwitch
-    {}
+    { }
     class Touch
-    {}
-    class ReplaceBulb
-    {}
+    { }
+
 }
