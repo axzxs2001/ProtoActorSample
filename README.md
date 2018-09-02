@@ -1,5 +1,7 @@
 # ProtoActorSample
 Proto.Actor Sample and PPT
+<img src="http://proto.actor/images/protowhite.png" alt="GitHub" title="Ocelot.JwtAuthorize" width="360"/>
+
 
 ### 1. 《通过C#学Proto.Actor模型》之 HelloWorld
     https://www.cnblogs.com/axzxs2001/p/9538313.html
