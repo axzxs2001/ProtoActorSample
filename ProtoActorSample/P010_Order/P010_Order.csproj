@@ -6,7 +6,33 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Proto.Actor" Version="0.1.16" />
+    <PackageReference Include="Proto.Persistence" Version="0.1.16" />
+    <PackageReference Include="Proto.Persistence.Sqlite" Version="0.1.16" />
+    <PackageReference Include="Proto.Remote" Version="0.1.16" />
+    <PackageReference Include="Proto.Serialization.Wire" Version="0.1.16" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\P010_Libs\P010_Libs.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System">
+      <HintPath>System</HintPath>
+    </Reference>
+    <Reference Include="System.Data">
+      <HintPath>System.Data</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <HintPath>System.Drawing</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="OrderActor.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
 
 </Project>
