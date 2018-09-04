@@ -3,27 +3,26 @@
 namespace P010_Libs
 {
     /// <summary>
-    /// 订单
+    /// 运单
     /// </summary>
-    public class Order
+    public class Ship
     {
         /// <summary>
-        /// 订单编号
+        /// 地址
         /// </summary>
-        public string OrderNo { get; set; }
+        public string Address { get; set; }
         /// <summary>
-        /// 订单总额
+        /// 电话
         /// </summary>
-        public decimal Total { get; set; }
-
+        public string Mobile { get; set; }
         /// <summary>
         /// 订单时间
         /// </summary>
-        public DateTime OrderTime { get; set; }
+        public DateTime Shiptime { get; set; }
 
         public override string ToString()
         {
-            return $"OrderNo={OrderNo},Total={Total},OrderTime={OrderTime}";
+            return $"Address={Address},Mobile={Mobile},Shiptime={Shiptime}";
         }
     }
 }
