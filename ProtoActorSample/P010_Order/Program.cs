@@ -10,6 +10,7 @@ namespace P010_Order
     {
         static void Main(string[] args)
         {
+            Console.Title = "Order系统";
             var actorid = "order_actor_id";
             var dbfile = @"C:\MyFile\Source\Repos\ProtoActorSample\ProtoActorSample\P010_Order\data.sqlite";
             var sqliteProvider = new SqliteProvider(new SqliteConnectionStringBuilder() { DataSource = dbfile });

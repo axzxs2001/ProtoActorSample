@@ -57,23 +57,23 @@ namespace P010_Order
         {
             switch (context.Message)
             {
-                case Started  started:
+                case Started started:
                     Console.WriteLine("开始处理");
                     await _persistence.PersistEventAsync(started);
                     break;
-            } 
+            }
         }
         private async Task Ordering(IContext context)
         {
-            switch(context.Message)
+            switch (context.Message)
             {
                 case Order order:
-                    context.Spawn(Actor.FromProducer(()=>new OrderingActor()));
+                    var pid = context.Spawn(Actor.FromProducer(() => new OrderingActor()));
                     Console.WriteLine("保存订单，更新库存:" + order);
-                    await _persistence.PersistEventAsync(new Ship());
+                    await _persistence.PersistEventAsync(new Ship { Address = "东京中央区茅埸町PMO", Mobile = "13453467144", Shiptime = DateTime.Now, Name = "桂素伟", OrderNo = order.OrderNo });                
                     break;
             }
-           
+
         }
         private async Task OrderComplete(IContext context)
         {
@@ -86,8 +86,9 @@ namespace P010_Order
             var pid = Remote.SpawnNamedAsync("127.0.0.1:5001", "shiping", "ship", TimeSpan.FromSeconds(50)).Result.Pid;
 
             var result = await pid.RequestAsync<bool>(context.Message);
-            Console.WriteLine(result);
-        }  
+            Console.WriteLine("下订单返回结果：{result}");
+        }
+
 
     }
 }

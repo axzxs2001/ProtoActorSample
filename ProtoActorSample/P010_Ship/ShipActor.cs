@@ -1,20 +1,24 @@
 ﻿using P010_Libs;
 using Proto;
+using System;
 using System.Threading.Tasks;
 
-namespace P010_Order
+namespace P010_Ship
 {
-    public class OrderingActor : IActor
+    class ShipActor : IActor
     {
+
         public Task ReceiveAsync(IContext context)
         {
             switch (context.Message)
             {
-                case Ship ship:
-                    context.Parent.Tell(ship);
+                case Ship  ship:
+                    Console.WriteLine($"处理：{ship}");
+                    context.Respond(true);
                     break;
             }
             return Actor.Done;
         }
+
     }
 }

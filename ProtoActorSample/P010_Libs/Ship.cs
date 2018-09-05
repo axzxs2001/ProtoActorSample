@@ -20,9 +20,19 @@ namespace P010_Libs
         /// </summary>
         public DateTime Shiptime { get; set; }
 
+        /// <summary>
+        /// 姓名
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 订单编号
+        /// </summary>
+        public string OrderNo { get; set; }
+
         public override string ToString()
         {
-            return $"Address={Address},Mobile={Mobile},Shiptime={Shiptime}";
+            return $"Address={Address},Mobile={Mobile},Shiptime={Shiptime}，Name={Name}，OrderNo={OrderNo}";
         }
     }
 }
