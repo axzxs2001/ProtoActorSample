@@ -12,6 +12,9 @@ namespace P010_Ship
         {
             switch (context.Message)
             {
+                case Started started:
+                    Console.WriteLine("shipping……");
+                    break;
                 case Ship  ship:
                     Console.WriteLine($"处理：{ship}");
                     context.Respond(true);

@@ -9,7 +9,7 @@ namespace P100_Saga
         {
 
             Console.WriteLine("Starting");
-            var numberOfTransfers = 20;
+            var numberOfTransfers = 1;// 20;
             var uptime = 59.99;
             var retryAttempts = 0;
             var refusalProbability = 0.31;

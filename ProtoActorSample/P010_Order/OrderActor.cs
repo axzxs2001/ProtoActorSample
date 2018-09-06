@@ -13,8 +13,7 @@ namespace P010_Order
     {
         readonly Behavior _behavior;
         readonly Persistence _persistence;
-        readonly string _persistenceId;
-        readonly IProvider _provider;
+
         public OrderActor(IProvider provider, string persistenceId)
         {
             _behavior = new Behavior();
@@ -31,11 +30,8 @@ namespace P010_Order
                     _behavior.Become(Ordering);
                     break;
                 case Order order:
-                    _behavior.Become(Ordering);
-                    break;
-                case Ship ship:
                     _behavior.Become(OrderComplete);
-                    break;
+                    break;            
             }
         }
 
@@ -60,6 +56,7 @@ namespace P010_Order
                 case Started started:
                     Console.WriteLine("开始处理");
                     await _persistence.PersistEventAsync(started);
+                    context.Tell(context.Self,new Order { OrderNo = "DJ000012352", Total = 1524631.25m, OrderTime = DateTime.Now });
                     break;
             }
         }
@@ -68,9 +65,9 @@ namespace P010_Order
             switch (context.Message)
             {
                 case Order order:
-                    var pid = context.Spawn(Actor.FromProducer(() => new OrderingActor()));
                     Console.WriteLine("保存订单，更新库存:" + order);
-                    await _persistence.PersistEventAsync(new Ship { Address = "东京中央区茅埸町PMO", Mobile = "13453467144", Shiptime = DateTime.Now, Name = "桂素伟", OrderNo = order.OrderNo });                
+                    await _persistence.PersistEventAsync(order);                  
+                    context.Tell(context.Self,new Ship { Address = "东京中央区茅埸町PMO", Mobile = "13453467144", Shiptime = DateTime.Now, Name = "桂素伟", OrderNo = order.OrderNo });
                     break;
             }
 
@@ -86,7 +83,7 @@ namespace P010_Order
             var pid = Remote.SpawnNamedAsync("127.0.0.1:5001", "shiping", "ship", TimeSpan.FromSeconds(50)).Result.Pid;
 
             var result = await pid.RequestAsync<bool>(context.Message);
-            Console.WriteLine("下订单返回结果：{result}");
+            Console.WriteLine($"下订单返回结果：{result}");
         }
 
 
