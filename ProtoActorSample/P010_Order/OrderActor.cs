@@ -54,7 +54,7 @@ namespace P010_Order
             Console.WriteLine($"下订单返回结果：{result}");
             if (result)
             {
-                //await _persistence.DeleteEventsAsync(10);
+                await _persistence.DeleteEventsAsync(10);
             }
         }
 
@@ -87,7 +87,17 @@ namespace P010_Order
             switch (context.Message)
             {
                 case Order order:
-                    Console.WriteLine($"OrderActor:收到order {order}");
+                    var random = new Random();
+                    var i = random.Next(1, 3);
+                    if (i == 1)
+                    {
+                        Console.WriteLine($"OrderActor:收到order {order}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("处理Order异常");
+                        throw new Exception("处理Order异常");
+                    }
                     await _persistence.PersistEventAsync(order);
 
                     break;
@@ -99,7 +109,18 @@ namespace P010_Order
             switch (context.Message)
             {
                 case Ship ship:
-                    Console.WriteLine($"OrderActor:收到Ship {ship}");
+
+                    var random = new Random();
+                    var i = random.Next(1, 3);
+                    if (i == 1)
+                    {
+                        Console.WriteLine($"OrderActor:收到Ship {ship}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("处理Ship异常");
+                        throw new Exception("处理Ship异常");
+                    }
                     await _persistence.PersistEventAsync(ship);
                     break;
             }
