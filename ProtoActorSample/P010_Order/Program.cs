@@ -12,7 +12,7 @@ namespace P010_Order
         {
             Console.Title = "Order系统";
             System.Threading.Thread.Sleep(100);
-            var actorid = "order_actor_id";
+            var actorid = "order_actor_ids";
             var dbfile = @"C:\MyFile\Source\Repos\ProtoActorSample\ProtoActorSample\P010_Order\data.sqlite";
             var sqliteProvider = new SqliteProvider(new SqliteConnectionStringBuilder() { DataSource = dbfile });
             var props = Actor.FromProducer(() => new OrderActor(sqliteProvider,actorid));
