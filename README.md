@@ -1,6 +1,8 @@
 # ProtoActorSample
 Proto.Actor Sample and PPT
 
+P0010_Lib,P010_Order,P010_Ship是一个综合项目，一个服务Ship为服务端角色，Order为客户端角色
+
 <img src="http://proto.actor/images/protowhite.png" alt="GitHub" title="Ocelot.JwtAuthorize" width="360"/>
 
 
