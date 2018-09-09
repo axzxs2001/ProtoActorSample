@@ -55,6 +55,7 @@ namespace P100_Saga
             {
                 //贷方
                 case Credit msg when _processedMessages.ContainsKey(msg.ReplyTo):
+                    //msg.ReplyTo是PransferProcess的子Actor DebitAttempt
                     msg.ReplyTo.Tell(_processedMessages[msg.ReplyTo]);
                     return Actor.Done;
                 //贷方
@@ -126,6 +127,7 @@ namespace P100_Saga
             //模拟处理后失败，这将迫使引起重试操作，并测试幂等操作
             if (behaviour == Behavior.FailAfterProcessing)
             {
+                //replyTo是PransferProcess的子Actor DebitAttempt
                 replyTo.Tell(new InternalServerError());
                 return Actor.Done;
             }
